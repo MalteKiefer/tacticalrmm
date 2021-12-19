@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://wh1te909.github.io/tacticalrmm/install_agent/">
       
       <link rel="icon" href="../images/favicon.ico">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.1">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.2">
     
     
       
@@ -23,7 +23,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.23b6d78a.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.f7951f6f.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.e6a45f82.min.css">
@@ -1377,18 +1377,37 @@ You can then move the agent into the correct client/site from the web UI after i
 <p class="admonition-title">Note</p>
 <p>You will need to replace <code>deployment url</code> with your custom deployment URL</p>
 </div>
-<div class="highlight"><pre><span></span><code><span class="k">if</span> <span class="k">not</span> <span class="k">exist</span> C:\TEMP\TRMM <span class="k">md</span> C:\TEMP\TRMM
-powershell Set-ExecutionPolicy -ExecutionPolicy Unrestricted
-powershell Add-MpPreference -ExclusionPath C:\TEMP\TRMM
-powershell Add-MpPreference -ExclusionPath <span class="s2">&quot;C:\Program Files\TacticalAgent\*&quot;</span>
-powershell Add-MpPreference -ExclusionPath C:\Windows\Temp\winagent-v*.exe
-powershell Add-MpPreference -ExclusionPath <span class="s2">&quot;C:\Program Files\Mesh Agent\*&quot;</span>
-powershell Add-MpPreference -ExclusionPath C:\Windows\Temp\TRMM\*
-<span class="k">cd</span> c:\temp\trmm
-powershell Invoke-WebRequest <span class="s2">&quot;deployment url&quot;</span> -Outfile tactical.exe
-<span class="s2">&quot;C:\Program Files\TacticalAgent\unins000.exe&quot;</span> /VERYSILENT /SUPPRESSMSGBOXES /FORCECLOSEAPPLICATIONS
-<span class="k">start</span> tactical.exe
-powershell Remove-MpPreference -ExclusionPath C:\TEMP\TRMM
+<div class="highlight"><pre><span></span><code><span class="p">@</span><span class="k">echo</span> off
+
+<span class="c1">REM Setup deployment URL</span>
+<span class="k">set</span> <span class="s2">&quot;DeploymentURL=&quot;</span>
+
+<span class="k">set</span> <span class="s2">&quot;Name=&quot;</span>
+<span class="k">for</span> <span class="k">/f</span> <span class="s2">&quot;usebackq tokens=* delims=&quot;</span> <span class="se">%%</span># <span class="k">in</span> <span class="p">(</span>
+    <span class="sb">`wmic service where &quot;name like &#39;tacticalagent&#39;&quot; get Name /Format:Value`</span>
+<span class="p">)</span> <span class="k">do</span> <span class="p">(</span>
+    <span class="k">for</span> <span class="k">/f</span> <span class="s2">&quot;tokens=* delims=&quot;</span> <span class="se">%%</span>g <span class="k">in</span> <span class="p">(</span><span class="s2">&quot;</span><span class="se">%%</span><span class="s2">#&quot;</span><span class="c1">) do set &quot;%%g&quot;</span>
+<span class="p">)</span>
+
+if not defined Name (
+    echo Tactical RMM not found, installing now.
+    if not exist C:\TEMP\TRMM md C:\TEMP\TRMM
+    powershell Set-ExecutionPolicy -ExecutionPolicy Unrestricted
+    powershell Add-MpPreference -ExclusionPath C:\TEMP\TRMM
+    powershell Add-MpPreference -ExclusionPath <span class="s2">&quot;C:\Program Files\TacticalAgent\*&quot;</span>
+    powershell Add-MpPreference -ExclusionPath C:\Windows\Temp\winagent-v*.exe
+    powershell Add-MpPreference -ExclusionPath <span class="s2">&quot;C:\Program Files\Mesh Agent\*&quot;</span>
+    powershell Add-MpPreference -ExclusionPath C:\Windows\Temp\TRMM\*
+    cd c:\temp\trmm
+    powershell Invoke-WebRequest <span class="s2">&quot;</span><span class="nv">%DeploymentURL%</span><span class="s2">&quot;</span> -Outfile tactical.exe
+    REM<span class="s2">&quot;C:\Program Files\TacticalAgent\unins000.exe&quot;</span> /VERYSILENT /SUPPRESSMSGBOXES /FORCECLOSEAPPLICATIONS
+    tactical.exe
+    powershell Remove-MpPreference -ExclusionPath C:\TEMP\TRMM
+    rem exit /b 1
+<span class="p">)</span> else (
+       echo Tactical RMM already installed Exiting
+  Exit 0
+<span class="p">)</span>
 </code></pre></div>
 <p>There is also a full powershell version <a href="https://wh1te909.github.io/tacticalrmm/3rdparty_screenconnect/#install-tactical-rmm-via-screeconnect-commands-window">here</a></p>
 
@@ -1469,10 +1488,10 @@ powershell Remove-MpPreference -ExclusionPath C:\TEMP\TRMM
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.c7dec7e7.min.js"}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.0bbba5b5.min.js"}</script>
     
     
-      <script src="../assets/javascripts/bundle.da79ceb7.min.js"></script>
+      <script src="../assets/javascripts/bundle.649a939e.min.js"></script>
       
     
   </body>
